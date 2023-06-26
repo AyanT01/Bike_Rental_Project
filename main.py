@@ -1,129 +1,172 @@
-"""import datetime as dt
-now = dt.datetime.now()
-then = dt.date(2011,12,11)
-def print_(text):
-    new_text = f"{text.month}-{text.day}-{text.year}"
-    return new_text
-now = now.strftime("%m/%d/%Y, %H:%M:%S")
-print(now)
-"""
-import datetime as dt
+import datetime
 class BikeRental:
-    def __init__(self,stock):
-        """ Initializer for the stock"""
-        self.__stock = stock
-
+    def __init__(self,bikes):
+        self.__bikes = bikes
     @property
-    def display(self):
-        """Displays the bikes that are currently available in the station """
-        return self.__stock
-    @display.setter
-    def set_bike_number(self,n):
-        if n < 0:
-            self.__stock += n
-        else:
-            self.__stock += n
-    def rent_bike_on_hourly_basis(self,n):
-        """Rent a bike on hourly basis"""
-        if n <= 0:
-            print("Can only rent a positive number of bikes. ")
+    def bikes(self):
+        """Gets the number of bikes available in the stations"""
+        return self.__bikes
+    def display_stock(self):
+        print(f"There are {self.bikes} bikes available in the system.")
+    @bikes.setter
+    def bikes(self,n):
+        """Updates the bikes in the station."""
+        self.__bikes += n
+    def rent_on_hourly_basis(self,num_of_bikes):
+        """Rents bikes to customers on hourly basis and returns the time"""
+        if num_of_bikes <= 0:
+            print("You can only rent a positive number of bikes.")
+        elif num_of_bikes > self.bikes:
+            print(f"You can only rent up to the number of bikes available which is {self.bikes}")
             return None
-        elif n > self.display:
-            print(f"There are {self.display} bikes available for rent, please only select a number up to the amount available.")
+        else:
+            now = datetime.datetime.now()
+            print(f"You have rented {num_of_bikes} on hourly basis at {now}")
+            self.bikes = -num_of_bikes
+            return now
 
-        else:
-            now = dt.datetime.now()
-            print(f"You have rented {n} number of bikes today at {now.hour}:{now.minute}:{now.second}")
-            print("You will be charged $5 for each hour you spend on the bike")
-            print("We hope that you enjoy our services!!")
-            self.set_bike_number = -n
-            return now
-    def rent_bikes_on_daily_basis(self,n):
-        """Rent bikes on daily bases. """
-        if n <= 0:
-            print("You can only rent positive numbers of bikes")
-            return None
-        elif n > self.display:
-            print(f"There are {self.display} bikes available for rent, please only select a number that is less than or up to the amount available.")
+    def rent_on_daily_basis(self,num_of_bikes):
+        """Rents bikes to customers on daily basis and returns the time"""
+        if num_of_bikes <= 0:
+            print("You can only rent a positive number of bikes.")
+        elif num_of_bikes > self.bikes:
+            print(f"You can only rent up to the number of bikes available which is {self.bikes}")
             return None
         else:
-            now = dt.date.today()
-            print(f"You have rented a bike on daily basis at {now.month}/{now.day}/{now.year}")
-            print("You will be charged $20 daily")
-            print("We hope that you enjoy our services!!")
-            self.set_bike_number = -n
+            now = datetime.datetime.today()
+            print(f"You have rented {num_of_bikes} on daily basis at {now}")
+            self.bikes = -num_of_bikes
             return now
-    def rent_bikes_on_weekly_basis(self,n):
-        """Rent bikes on weekly basis"""
-        if n <= 0:
-            print("You can only rent positive numbers of bikes.")
-            return None
-        elif n > self.display:
-            print(f"There are {self.display} bikes available in the station. Please select a positive number that is less than or up to the amount available. ")
+
+    def rent_on_weekly_basis(self,num_of_bikes):
+        """Rents bikes to customers on weekly basis and returns the time"""
+        if num_of_bikes <= 0:
+            print("You can only rent a positive number of bikes.")
+        elif num_of_bikes > self.bikes:
+            print(f"You can only rent up to the number of bikes available which is {self.bikes}")
             return None
         else:
-            now = dt.date.today()
-            print(f"You have rented a bike on weekly basis at {now}")
-            print("You will be charged $60 weekly")
-            print("We hope that you enjoy our services!!")
-            self.set_bike_number = -n
+            now = datetime.datetime.today()
+            print(f"You have rented {num_of_bikes} on hourly basis at {now}")
+            self.bikes = -num_of_bikes
             return now
-    def return_bike(self,requests):
-        """Returns the bike into the system, increases the number of bikes in the system and gives the customer their bills. """
+
+    def return_bikes(self,requests):
         rental_time, rental_basis, num_of_bikes = requests
         if rental_time and rental_basis and num_of_bikes:
-            now = dt.datetime.now()
-            rental_period = now - rental_time
-            #Hourly rental calculation
             if rental_basis == 1:
-                amount = rount((rental_period / 3600) * 5 * num_of_bikes)
-            #Daily rental calculation
+                #Total Hourly bill
+                bill = round((rental_time.second/3600) * 5 * num_of_bikes)
             elif rental_basis == 2:
-                amount = round(rental_period.days * num_of_bikes * 20)
+                #Total daily bill
+                bill = round((rental_time.day/24) * 20 * num_of_bikes)
             elif rental_basis == 3:
-                amount = round(rental_period.days / 7 * num_of_bikes * 60)
-            if num_of_bikes >= 3 and num_of_bikes <= 6:
-                print("You are eligible for family discount promotion ")
-                amount *= 0.7
-            self.set_bike_number == num_of_bikes
-            print("Thanks for returning the bikes. Hope you enjoyed them! ")
-            print(f"The bill is ${amount}")
-            return amount
+                #Total weekly bill
+                bill = round((rental_time.day/7)* 60 * num_of_bikes)
+            print("Thanks for renting with us, we hope you enjoyed our services!! ")
+            print(f"Your bill is {bill}")
+            return bill
         else:
-            print("Are you sure you rented a bike with us. ")
+            print("Are you sure you rented with us? ")
             return None
-
 
 class Customer:
     def __init__(self):
-        """Initialize variables in the customer class"""
-        self.bikes = 0
-        self.rental_basis = 0
-        self.rental_time = 0
-        self.bill = 0
-    def request_bike(self):
-        """Takes a request from the customer for the number of bikes"""
-        bikes = input("Enter the number of bikes you would like to rent: ")
+        self.__bikes = 0
+        self.__rental_basis = 0
+        self.__rental_time = 0
+        self.__bill = 0
+    @property
+    def bikes(self):
+        return self.__bikes
+    @bikes.setter
+    def bikes(self,n):
+        self.__bikes = n
+    @property
+    def rental_basis(self):
+        return self.__rental_basis
+    @rental_basis.setter
+    def rental_basis(self,n):
+        self.__rental_basis = n
+    @property
+    def rental_time(self):
+        return self.__rental_time
+    @rental_time.setter
+    def rental_time(self,n):
+        self.__rental_time = n
+    @property
+    def bill(self):
+        return self.__bill
+    @bill.setter
+    def bill(self,n):
+        self.__bill = n
+    def request_bikes(self):
+        bikes = input("How many bikes would you like to rent today: ")
         try:
             bikes = int(bikes)
         except ValueError:
-            print("The number of bikes has to be a positive integer!!")
+            print("Number of bikes must be a positive integer")
             return -1
-        bikes = int(bikes)
         if bikes <= 0:
-            print("The number of bikes has to be a positive integer!!")
+            print("Can only request a positive number of bikes")
+            return 0
         else:
             self.bikes = bikes
         return self.bikes
     def return_bikes(self):
-        """Allows customer to the rental shop"""
-        if self.rentail_basis and self.rental_time and self.bill:
+        if self.rental_time and self.rental_basis and self.bikes:
             return self.rental_time, self.rental_basis, self.bikes
         else:
             return 0,0,0
 
-
+Bike_system = BikeRental(100)
 customer = Customer()
-customer.request_bike()
-print(customer.bikes)
+while True:
+    print("""
+    ====== Bike Rental App ======
+    1. Display available bikes 
+    2. Rent bikes on hourly basis --> $5 per hour 
+    3. Rent bikes on daily basis --> $20 per day
+    4. Rent bikes on weekly basis --> $60 per week
+    5. Return bikes 
+    6. Exit
+    """)
+    choice = input("Enter choice: ")
+    try:
+        choice = int(choice)
+    except ValueError:
+        print("Choice must be a number between 1-6. ")
+        continue
+    if choice == 1:
+        Bike_system.display_stock()
+    elif choice == 2:
+        requested_bikes = customer.request_bikes()
+        rental_time = Bike_system.rent_on_daily_basis(requested_bikes)
+        customer.rental_time = rental_time
+        customer.rental_basis = 1
+
+    elif choice ==3 :
+        requested_bikes = customer.request_bikes()
+        rental_time = Bike_system.rent_on_daily_basis(requested_bikes)
+        customer.rental_time = rental_time
+        customer.rental_basis = 2
+    elif choice == 4:
+        requested_bikes = customer.request_bikes()
+        rental_time = Bike_system.rent_on_weekly_basis(requested_bikes)
+        customer.rental_time = rental_time
+        customer.rental_basis = 3
+    elif choice == 5:
+        request_tuple = customer.return_bikes()
+        print(request_tuple)
+        bill = Bike_system.return_bikes(request_tuple)
+        customer.bill = bill
+        customer.rental_time, customer.rental_basis, customer.bill = 0,0,0
+    elif choice == 6:
+        break
+    else:
+        print("Invalid input, Please enter a number between 1 and 6")
+print("Thanks for using the bike rental system!")
+
+
+
 
